@@ -1,76 +1,32 @@
 spring:
   datasource:
-    url: jdbc:mysql://localhost:3306/pickleball
-    username: root
-    password: root
-    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:h2:mem:pickleballdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
 
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: create-drop
     show-sql: true
     properties:
       hibernate:
-        dialect: org.hibernate.dialect.MySQL8Dialect
-#  datasource:
-#    url: jdbc:h2:mem:pickleballdb
-#    driver-class-name: org.h2.Driver
-#    username: sa
-#    password:
+        dialect: org.hibernate.dialect.H2Dialect
+        format_sql: true
 
-#  jpa:
-#    hibernate:
-#      ddl-auto: update
-#    show-sql: true
-#    properties:
-#      hibernate:
-#        dialect: org.hibernate.dialect.H2Dialect
-#  h2:
-#    console:
-#      enabled: true
-#      path: /h2-console
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
 
   thymeleaf:
-    cache: false
-    prefix: classpath:/templates/
-    suffix: .html
-    mode: HTML
-
-  kafka:
     enabled: false
-
-#  kafka:
-#    bootstrap-servers: localhost:9092
-#    consumer:
-#      group-id: user-events-group
-#      auto-offset-reset: earliest
-#      key-deserializer: org.springframework.kafka.support.serializer.ErrorHandlingDeserializer
-#      value-deserializer: org.springframework.kafka.support.serializer.ErrorHandlingDeserializer
-#      properties:
-#        spring.json.trusted.packages: "*"
-#        spring.deserializer.key.delegate.class: org.springframework.kafka.support.serializer.JsonDeserializer
-#        spring.deserializer.value.delegate.class: org.springframework.kafka.support.serializer.JsonDeserializer
-#        spring.json.value.default.type: java.util.LinkedHashMap
-#        spring.json.key.default.type: java.util.LinkedHashMap
-#    listener:
-#      ack-mode: MANUAL_IMMEDIATE
-#    properties:
-#      # Handle deserialization errors
-#      spring.deserializer.key.delegate.class: org.springframework.kafka.support.serializer.JsonDeserializer
-#      spring.deserializer.value.delegate.class: org.springframework.kafka.support.serializer.JsonDeserializer
 
 management:
   endpoints:
     web:
       exposure:
         include: "*"
-  endpoint:
-    health:
-      show-details: always
-  info:
-    env:
-      enabled: false
-
 
 jwt:
   secret: JdSHiEInKEVSQRkA5WjrE4Vdwx4VMaTGYx3Hszisbp/BV7FdL+uTPQKJ5i7TK+z8gspJOkrXKHxdbW9AVvQO2g==
@@ -83,8 +39,3 @@ logging:
   level:
     org.springframework.security: DEBUG
     org.hibernate.SQL: DEBUG
-    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
-#    org.springframework.kafka: DEBUG
-#    com.example.kafka: DEBUG
-#    org.springframework.kafka.listener.KafkaMessageListenerContainer: ERROR
-#    org.apache.kafka: WARN
