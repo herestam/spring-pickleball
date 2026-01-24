@@ -33,6 +33,8 @@ management:
 jwt:
   secret: JdSHiEInKEVSQRkA5WjrE4Vdwx4VMaTGYx3Hszisbp/BV7FdL+uTPQKJ5i7TK+z8gspJOkrXKHxdbW9AVvQO2g==
   expiration: 3600000
+  access-expiration: 900000      # 15 minutes (in ms)
+  refresh-expiration: 604800000  # 7 days (in ms)
 
 server:
   address: 0.0.0.0

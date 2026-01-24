@@ -1,4 +1,4 @@
-package com.pickleball.identity.dto.api.dto;
+package com.pickleball.identity.dto.api;
 
 import lombok.Data;
 

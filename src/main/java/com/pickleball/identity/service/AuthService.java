@@ -1,13 +1,15 @@
 package com.pickleball.identity.service;
 
-import com.pickleball.identity.dto.*;
 import com.pickleball.identity.model.*;
-import com.pickleball.identity.model.dto.LoginRequest;
-import com.pickleball.identity.model.dto.RegisterRequest;
+import com.pickleball.identity.dto.LoginRequest;
+import com.pickleball.identity.dto.LoginResponse;
+import com.pickleball.identity.dto.RefreshResponse;
+import com.pickleball.identity.dto.RegisterRequest;
 import com.pickleball.identity.repository.*;
 import com.pickleball.identity.security.JwtService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.*;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -16,6 +18,9 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @RequiredArgsConstructor
 public class AuthService {
+
+    @Value("${jwt.access-expiration}")
+    private long accessExpiration;
 
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
@@ -56,6 +61,37 @@ public class AuthService {
 
         return jwtService.generateToken(request.getUsername());
     }
+
+    public LoginResponse loginAuth(LoginRequest request) {
+
+        authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(
+                        request.getUsername(),
+                        request.getPassword()
+                )
+        );
+
+        User user = userRepository.findByUsernameIgnoreCase(request.getUsername())
+                .orElseThrow();
+
+        String accessToken = jwtService.generateAccessToken(user);
+        String refreshToken = jwtService.generateRefreshToken(user);
+
+        return new LoginResponse(
+                accessToken,
+                refreshToken,
+                accessExpiration / 1000,
+                user.getUsername(),
+                user.getRoles().stream()
+                        .map(userRole -> userRole.getRole().getName())
+                        .toList()
+        );
+    }
+
+    public RefreshResponse refreshAccessToken(String refreshToken) {
+        return jwtService.refreshAccessToken(refreshToken);
+    }
+
 
     @Transactional
     public void logout(HttpServletRequest request) {

@@ -1,6 +1,6 @@
 package com.pickleball.identity.controller;
 
-import com.pickleball.identity.dto.api.dto.UserResponse;
+import com.pickleball.identity.dto.api.UserResponse;
 import com.pickleball.identity.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
