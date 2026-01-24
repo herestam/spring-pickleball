@@ -1,25 +1,26 @@
 APP_NAME=identity
 IMAGE_NAME=identity-app
 PORT=8081
+DOCKER=sudo docker
 
 build:
-	docker build -t $(IMAGE_NAME) .
+	$(DOCKER) build -t $(IMAGE_NAME) .
 
 run:
-	docker run -d \
+	$(DOCKER) run -d \
 		--name $(APP_NAME) \
 		-p $(PORT):$(PORT) \
 		--restart unless-stopped \
 		$(IMAGE_NAME)
 
 stop:
-	docker stop $(APP_NAME) || true
-	docker rm $(APP_NAME) || true
+	-$(DOCKER) stop $(APP_NAME)
+	-$(DOCKER) rm $(APP_NAME)
 
 restart: stop build run
 
 logs:
-	docker logs -f $(APP_NAME)
+	$(DOCKER) logs -f $(APP_NAME)
 
 status:
-	docker ps | grep $(APP_NAME)
+	$(DOCKER) ps | grep $(APP_NAME)

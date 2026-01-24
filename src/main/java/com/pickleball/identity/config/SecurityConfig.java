@@ -95,6 +95,9 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
         http
+                .cors(cors -> {})
+                // 🧪 CSRF (disable only where needed)
+                .csrf(csrf -> csrf.disable())
                 // 🔐 AUTHORIZATION
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
@@ -113,11 +116,6 @@ public class SecurityConfig {
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
                         .requestMatchers("/api/**").hasAnyRole("USER", "ADMIN")
                         .anyRequest().authenticated()
-                )
-
-                // 🧪 CSRF (disable only where needed)
-                .csrf(csrf -> csrf
-                        .ignoringRequestMatchers("/h2-console/**", "/api/**")
                 )
 
                 // 🖼️ H2 uses frames
