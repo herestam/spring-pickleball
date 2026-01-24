@@ -6,6 +6,7 @@ import com.pickleball.identity.model.dto.LoginRequest;
 import com.pickleball.identity.model.dto.RegisterRequest;
 import com.pickleball.identity.repository.*;
 import com.pickleball.identity.security.JwtService;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.*;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -22,6 +23,8 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
     private final JwtService jwtService;
+
+    private final UserJwtRepository userJwtRepository;
 
     @Transactional
     public void register(RegisterRequest request) {
@@ -53,4 +56,30 @@ public class AuthService {
 
         return jwtService.generateToken(request.getUsername());
     }
+
+    @Transactional
+    public void logout(HttpServletRequest request) {
+
+        String authHeader = request.getHeader("Authorization");
+
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            return;
+        }
+
+        String jwt = authHeader.substring(7);
+        String tokenId = jwtService.extractTokenId(jwt);
+
+        userJwtRepository.findByTokenId(tokenId)
+                .ifPresent(token -> {
+                    token.setRevoked(true);
+                    userJwtRepository.save(token);
+                });
+    }
+//
+//        userJwtRepository.findByTokenId(tokenId)
+//                .ifPresent(storedToken -> {
+//                    storedToken.setRevoked(true);
+//                    userJwtRepository.save(storedToken);
+//                });
+//    }
 }

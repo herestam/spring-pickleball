@@ -4,7 +4,9 @@ import com.pickleball.identity.dto.*;
 import com.pickleball.identity.dto.api.dto.AuthResponse;
 import com.pickleball.identity.model.dto.LoginRequest;
 import com.pickleball.identity.model.dto.RegisterRequest;
+import com.pickleball.identity.repository.UserJwtRepository;
 import com.pickleball.identity.service.AuthService;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -27,4 +29,11 @@ public class ApiAuthController {
         String token = authService.login(request);
         return ResponseEntity.ok(new AuthResponse(token));
     }
+
+    @PostMapping("/logout")
+    public ResponseEntity<?> logout(HttpServletRequest request) {
+        authService.logout(request);
+        return ResponseEntity.ok("Logged out");
+    }
+
 }
