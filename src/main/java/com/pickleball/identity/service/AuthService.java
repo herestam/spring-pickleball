@@ -1,10 +1,7 @@
 package com.pickleball.identity.service;
 
 import com.pickleball.identity.model.*;
-import com.pickleball.identity.dto.LoginRequest;
-import com.pickleball.identity.dto.LoginResponse;
-import com.pickleball.identity.dto.RefreshResponse;
-import com.pickleball.identity.dto.RegisterRequest;
+import com.pickleball.identity.dto.*;
 import com.pickleball.identity.repository.*;
 import com.pickleball.identity.security.JwtService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -32,7 +29,7 @@ public class AuthService {
     private final UserJwtRepository userJwtRepository;
 
     @Transactional
-    public void register(RegisterRequest request) {
+    public User register(RegisterRequest request) {
 
         if (userRepository.existsByUsername(request.getUsername())) {
             throw new RuntimeException("Username already exists");
@@ -42,27 +39,17 @@ public class AuthService {
         user.setUsername(request.getUsername());
         user.setPassword(passwordEncoder.encode(request.getPassword()));
         user.setEnabled(true);
-        userRepository.save(user);
+        User savedUser = userRepository.save(user);
 
         Role userRole = roleRepository.findByName("USER")
                 .orElseThrow(() -> new RuntimeException("ROLE USER not found"));
 
-        userRoleRepository.save(new UserRole(user, userRole));
+        userRoleRepository.save(new UserRole(savedUser, userRole));
+        
+        return savedUser;
     }
 
-    public String login(LoginRequest request) {
-
-        authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                        request.getUsername(),
-                        request.getPassword()
-                )
-        );
-
-        return jwtService.generateToken(request.getUsername());
-    }
-
-    public LoginResponse loginAuth(LoginRequest request) {
+    public LoginResponse login(LoginRequest request) {
 
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
@@ -84,14 +71,24 @@ public class AuthService {
                 user.getUsername(),
                 user.getRoles().stream()
                         .map(userRole -> userRole.getRole().getName())
+                        .toList(),
+                user.getRoles().stream()
+                        .map(com.pickleball.identity.model.UserRole::getRole)
+                        .flatMap(role -> role.getPermissions().stream())
+                        .map(rp -> rp.getPermission().getName())
+                        .distinct()
                         .toList()
         );
+    }
+    
+    // Kept for backward compatibility or alias
+    public LoginResponse loginAuth(LoginRequest request) {
+       return login(request);
     }
 
     public RefreshResponse refreshAccessToken(String refreshToken) {
         return jwtService.refreshAccessToken(refreshToken);
     }
-
 
     @Transactional
     public void logout(HttpServletRequest request) {
@@ -111,11 +108,20 @@ public class AuthService {
                     userJwtRepository.save(token);
                 });
     }
-//
-//        userJwtRepository.findByTokenId(tokenId)
-//                .ifPresent(storedToken -> {
-//                    storedToken.setRevoked(true);
-//                    userJwtRepository.save(storedToken);
-//                });
-//    }
+
+    public void changePassword(ChangePasswordRequest request, String username) {
+        User user = userRepository.findByUsernameIgnoreCase(username)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        if (!passwordEncoder.matches(request.getCurrentPassword(), user.getPassword())) {
+            throw new RuntimeException("Invalid current password");
+        }
+
+        if (!request.getNewPassword().equals(request.getConfirmationPassword())) {
+             throw new RuntimeException("New password and confirmation do not match");
+        }
+
+        user.setPassword(passwordEncoder.encode(request.getNewPassword()));
+        userRepository.save(user);
+    }
 }

@@ -351,4 +351,46 @@ Say which one you want **next**:
 4️⃣ Refresh token
 5️⃣ Logout (revoke token)
 
-I recommend **1️⃣ JWT provider next** 🚀
+I recommend **1️⃣ JWT token provider next** 🚀
+
+---
+
+# 7️⃣ API ENDPOINTS AND DOCUMENTATION
+
+> 📘 **Interactive API Docs (Swagger UI):** http://localhost:8080/swagger-ui.html
+
+## 1. Authentication (`ApiAuthController`)
+
+| Method | URL | Protected | Description | Request Body / Parameters |
+| :--- | :--- | :--- | :--- | :--- |
+| **POST** | `/api/auth/register` | No | Register a new user | **Body (JSON):**<br>`{ "username": "...", "password": "..." }` |
+| **POST** | `/api/auth/login` | No | Login and get tokens | **Body (JSON):**<br>`{ "username": "...", "password": "..." }`<br>**Returns:** Access Token, Refresh Token |
+| **POST** | `/api/auth/refresh` | No | Refresh access token | **Body (JSON):**<br>`{ "refreshToken": "..." }` |
+| **POST** | `/api/auth/change-password` | **Yes** | Change password | **Body (JSON):**<br>`{ "currentPassword": "...", "newPassword": "...", "confirmationPassword": "..." }` |
+| **POST** | `/api/auth/logout` | **Yes** | Logout (revoke token) | **Header:** `Authorization: Bearer <token>` |
+| **POST** | `/api/auth/login-auth` | No | Alias for login | **Body (JSON):**<br>`{ "username": "...", "password": "..." }` |
+
+## 2. User Management (`UserController`)
+
+| Method | URL | Protected | Description | Request Body / Parameters |
+| :--- | :--- | :--- | :--- | :--- |
+| **GET** | `/api/users/me` | **Yes** | Get current user profile | **Header:** `Authorization: Bearer <token>` |
+| **PUT** | `/api/users/me` | **Yes** | Update current user profile | **Body (JSON):**<br>`{ "firstName": "...", "lastName": "...", "email": "..." }` |
+| **GET** | `/api/users` | **Admin** | List all users | **Header:** `Authorization: Bearer <admin_token>` |
+| **GET** | `/api/users/role/{role}` | **Admin** | List users by role | **Param:** `role` (e.g. USER, ADMIN)<br>**Header:** `Authorization: Bearer <admin_token>` |
+| **POST** | `/api/users/{id}/roles` | **Admin** | Assign role to user | **Path:** `id` (User ID)<br>**Body (JSON):**<br>`{ "roleName": "..." }` |
+
+## 3. Internal / System
+
+| Method | URL | Protected | Description | Request Body / Parameters |
+| :--- | :--- | :--- | :--- | :--- |
+| **POST** | `/internal/auth/validate` | **Internal** | Validate token (Microservice) | **Header:** `Authorization: Bearer <token>`<br>**Header:** `X-API-KEY: <internal_key>` |
+| **GET** | `/` | No | Home / Health check | None |
+
+## 4. Actuator (Spring Boot)
+
+| Method | URL | Protected | Description |
+| :--- | :--- | :--- | :--- |
+| **GET** | `/actuator/health` | No | Health check |
+| **GET** | `/actuator/info` | No | Application info |
+| **GET** | `/actuator` | No | List actuator endpoints |

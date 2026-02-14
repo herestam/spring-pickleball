@@ -20,9 +20,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfig {
 
     private final CustomUserDetailsService userDetailsService;
-
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
-
 
     public SecurityConfig(CustomUserDetailsService userDetailsService, JwtAuthenticationFilter jwtAuthenticationFilter) {
         this.userDetailsService = userDetailsService;
@@ -35,9 +33,7 @@ public class SecurityConfig {
     }
 
     @Bean
-    public AuthenticationManager authenticationManager(
-            AuthenticationConfiguration configuration
-    ) throws Exception {
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
         return configuration.getAuthenticationManager();
     }
 
@@ -49,83 +45,30 @@ public class SecurityConfig {
         return provider;
     }
 
-//    @Bean
-//    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-//        http
-//                .sessionManagement(s ->
-//                        s.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-//                )
-//
-//                .authenticationProvider(authenticationProvider())
-//
-//                .authorizeHttpRequests(auth -> auth
-//                        .requestMatchers(
-//                                "/",
-//                                "/actuator/health/**",
-//                                "/api/auth/**",
-//
-//                                // 🔓 SWAGGER / OPENAPI
-//                                "/v3/api-docs/**",
-//                                "/swagger-ui.html",
-//                                "/swagger-ui/**",
-//
-//                                // 🔓 H2 CONSOLE
-//                                "/h2-console/**"
-//                        ).permitAll()
-////                        .requestMatchers("/api/auth/**").permitAll()
-//                        .requestMatchers("/api/admin/**").hasRole("ADMIN")
-//                        .requestMatchers("/api/**").hasAnyRole("USER", "ADMIN")
-//                        .anyRequest().authenticated()
-//                )
-//
-//                // 🔥 CUSTOM TOKEN FILTER
-//                .addFilterBefore(
-//                        new TokenAuthenticationFilter(),
-//                        UsernamePasswordAuthenticationFilter.class
-//                )
-//
-//                .csrf(csrf -> csrf.disable())
-//                .formLogin(form -> form.disable())
-//                .logout(logout -> logout.disable());
-//
-//        return http.build();
-//    }
-
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-
         http
                 .cors(cors -> {})
-                // 🧪 CSRF (disable only where needed)
                 .csrf(csrf -> csrf.disable())
-                // 🔐 AUTHORIZATION
+                .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .authenticationProvider(authenticationProvider())
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
                                 "/",
-                                "/actuator/health/**",
+                                "/actuator/**",
                                 "/api/auth/**",
-
-                                // 🔓 SWAGGER
                                 "/v3/api-docs/**",
                                 "/swagger-ui.html",
                                 "/swagger-ui/**",
-
-                                // 🔓 H2
                                 "/h2-console/**"
                         ).permitAll()
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
                         .requestMatchers("/api/**").hasAnyRole("USER", "ADMIN")
                         .anyRequest().authenticated()
                 )
-
-                // 🖼️ H2 uses frames
-                .headers(headers -> headers
-                        .frameOptions(frame -> frame.disable())
-                ).addFilterBefore(jwtAuthenticationFilter,
-                        UsernamePasswordAuthenticationFilter.class);;
+                .headers(headers -> headers.frameOptions(frame -> frame.disable()))
+                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
-
-
 }

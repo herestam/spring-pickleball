@@ -23,14 +23,12 @@ public class ApiAuthController {
 
     @PostMapping("/register")
     public ResponseEntity<?> register(@Valid @RequestBody RegisterRequest request) {
-        authService.register(request);
-        return ResponseEntity.ok("Register success");
+        return ResponseEntity.ok(authService.register(request));
     }
 
     @PostMapping("/login")
-    public ResponseEntity<AuthResponse> login(@RequestBody LoginRequest request) {
-        String token = authService.login(request);
-        return ResponseEntity.ok(new AuthResponse(token));
+    public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest request) {
+        return ResponseEntity.ok(authService.login(request));
     }
 
     @PostMapping("/logout")
@@ -42,6 +40,18 @@ public class ApiAuthController {
     @PostMapping("/login-auth")
     public ResponseEntity<LoginResponse> loginAuth(@RequestBody LoginRequest request) {
         return ResponseEntity.ok(authService.loginAuth(request));
+    }
+
+    @PostMapping("/change-password")
+    public ResponseEntity<?> changePassword(@RequestBody Map<String, String> body, java.security.Principal principal) {
+        // We can use a proper DTO here, but let's use the one we created
+        com.pickleball.identity.dto.ChangePasswordRequest request = new com.pickleball.identity.dto.ChangePasswordRequest(
+            body.get("currentPassword"),
+            body.get("newPassword"),
+            body.get("confirmationPassword")
+        );
+        authService.changePassword(request, principal.getName());
+        return ResponseEntity.ok(Map.of("message", "Password changed successfully"));
     }
 
     // 🔄 REFRESH TOKEN

@@ -42,4 +42,19 @@ public class UserController {
                 userService.getCurrentUser()
         );
     }
+
+    // ✅ USER update profile
+    @PutMapping("/me")
+    public UserResponse updateProfile(@RequestBody com.pickleball.identity.dto.UpdateProfileRequest request) {
+        return UserResponse.fromEntity(
+                userService.updateUserProfile(userService.getCurrentUser().getId(), request)
+        );
+    }
+
+    // ✅ ADMIN assign role
+    @PostMapping("/{id}/roles")
+    @PreAuthorize("hasRole('ADMIN')")
+    public void assignRole(@PathVariable Long id, @RequestBody com.pickleball.identity.dto.AssignRoleRequest request) {
+        userService.assignRoleToUser(id, request.getRoleName());
+    }
 }
