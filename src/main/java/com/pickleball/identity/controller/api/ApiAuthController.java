@@ -1,6 +1,5 @@
 package com.pickleball.identity.controller.api;
 
-import com.pickleball.identity.dto.api.AuthResponse;
 import com.pickleball.identity.dto.LoginRequest;
 import com.pickleball.identity.dto.LoginResponse;
 import com.pickleball.identity.dto.RefreshResponse;
@@ -27,7 +26,7 @@ public class ApiAuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest request) {
+    public ResponseEntity<LoginResponse> login(@Valid @RequestBody LoginRequest request) {
         return ResponseEntity.ok(authService.login(request));
     }
 
@@ -38,31 +37,23 @@ public class ApiAuthController {
     }
 
     @PostMapping("/login-auth")
-    public ResponseEntity<LoginResponse> loginAuth(@RequestBody LoginRequest request) {
+    public ResponseEntity<LoginResponse> loginAuth(@Valid @RequestBody LoginRequest request) {
         return ResponseEntity.ok(authService.loginAuth(request));
     }
 
     @PostMapping("/change-password")
-    public ResponseEntity<?> changePassword(@RequestBody Map<String, String> body, java.security.Principal principal) {
-        // We can use a proper DTO here, but let's use the one we created
-        com.pickleball.identity.dto.ChangePasswordRequest request = new com.pickleball.identity.dto.ChangePasswordRequest(
-            body.get("currentPassword"),
-            body.get("newPassword"),
-            body.get("confirmationPassword")
-        );
+    public ResponseEntity<?> changePassword(@Valid @RequestBody com.pickleball.identity.dto.ChangePasswordRequest request, java.security.Principal principal) {
         authService.changePassword(request, principal.getName());
         return ResponseEntity.ok(Map.of("message", "Password changed successfully"));
     }
 
     // 🔄 REFRESH TOKEN
     @PostMapping("/refresh")
-    public ResponseEntity<RefreshResponse> refreshToken(@RequestBody Map<String, String> body) {
+    public ResponseEntity<RefreshResponse> refreshToken(@Valid @RequestBody com.pickleball.identity.dto.RefreshTokenRequest request) {
 
-        String refreshToken = body.get("refreshToken");
+        System.out.println("refresh token " + request.getRefreshToken());
 
-        System.out.println("refresh token " + refreshToken);
-
-        RefreshResponse response = authService.refreshAccessToken(refreshToken);
+        RefreshResponse response = authService.refreshAccessToken(request.getRefreshToken());
 
         return ResponseEntity.ok(response);
     }

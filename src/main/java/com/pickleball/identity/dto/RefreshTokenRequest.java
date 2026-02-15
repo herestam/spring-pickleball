@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class AssignRoleRequest {
-    @NotBlank(message = "Role name is required")
-    private String roleName;
+public class RefreshTokenRequest {
+    @NotBlank(message = "Refresh token is required")
+    private String refreshToken;
 }

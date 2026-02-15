@@ -32,4 +32,10 @@ public class GlobalExceptionHandler {
         return ResponseEntity.badRequest()
                 .body(Map.of("error", "Request body is missing or invalid JSON"));
     }
+
+    @ExceptionHandler(org.springframework.security.authentication.BadCredentialsException.class)
+    public ResponseEntity<?> handleBadCredentials(org.springframework.security.authentication.BadCredentialsException ex) {
+        return ResponseEntity.status(org.springframework.http.HttpStatus.UNAUTHORIZED)
+                .body(Map.of("error", "Invalid username or password"));
+    }
 }
