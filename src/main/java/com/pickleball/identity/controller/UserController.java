@@ -1,6 +1,6 @@
 package com.pickleball.identity.controller;
 
-import com.pickleball.identity.dto.api.dto.UserResponse;
+import com.pickleball.identity.dto.api.UserResponse;
 import com.pickleball.identity.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -41,5 +41,20 @@ public class UserController {
         return UserResponse.fromEntity(
                 userService.getCurrentUser()
         );
+    }
+
+    // ✅ USER update profile
+    @PutMapping("/me")
+    public UserResponse updateProfile(@jakarta.validation.Valid @RequestBody com.pickleball.identity.dto.UpdateProfileRequest request) {
+        return UserResponse.fromEntity(
+                userService.updateUserProfile(userService.getCurrentUser().getId(), request)
+        );
+    }
+
+    // ✅ ADMIN assign role
+    @PostMapping("/{id}/roles")
+    @PreAuthorize("hasRole('ADMIN')")
+    public void assignRole(@PathVariable Long id, @jakarta.validation.Valid @RequestBody com.pickleball.identity.dto.AssignRoleRequest request) {
+        userService.assignRoleToUser(id, request.getRoleName());
     }
 }

@@ -1,5 +1,6 @@
 package com.pickleball.identity;
 
+import com.pickleball.identity.model.User;
 import com.pickleball.identity.repository.UserRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,17 +17,16 @@ public class UserRepositoryTest {
     @Test
     public void testSaveUserToDatabase() {
         // Given
-//        User user = new User();
-//        user.setUsername("Test User");
-//        user.setEmail("testuser@example.com");
-//
-//        // When
-//        User savedUser = userRepository.save(user);
+        User user = new User();
+        user.setUsername("Test User");
+        user.setPassword("user test");
+
+        // When
+        User savedUser = userRepository.save(user);
 
         // Then
-//        assertThat(savedUser).isNotNull();
-//        assertThat(savedUser.getId()).isNotNull();
-//        assertThat(savedUser.getUsername()).isEqualTo("Test User");
-//        assertThat(savedUser.getEmail()).isEqualTo("testuser@example.com");
+        assertThat(savedUser).isNotNull();
+        assertThat(savedUser.getId()).isNotNull();
+        assertThat(savedUser.getUsername()).isEqualTo("Test User");
     }
 }

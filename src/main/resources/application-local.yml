@@ -18,6 +18,8 @@ spring:
     console:
       enabled: true
       path: /h2-console
+      settings:
+        web-allow-others: true
 
   thymeleaf:
     enabled: false
@@ -31,8 +33,15 @@ management:
 jwt:
   secret: JdSHiEInKEVSQRkA5WjrE4Vdwx4VMaTGYx3Hszisbp/BV7FdL+uTPQKJ5i7TK+z8gspJOkrXKHxdbW9AVvQO2g==
   expiration: 3600000
+  access-expiration: 900000      # 15 minutes (in ms)
+  refresh-expiration: 604800000  # 7 days (in ms)
+
+internal:
+  api:
+    key: 9f3c7e2a-6b11-4d4c-a2a0-8c51d91e7b52
 
 server:
+  address: 0.0.0.0
   port: 8081
 
 logging:
