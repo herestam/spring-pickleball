@@ -20,6 +20,8 @@ public class TokenStore {
                         .map(SimpleGrantedAuthority::new)
                         .toList();
 
+        System.out.println("authorities ===" + authorities);
+
         TOKENS.put(token, new UserToken(username, authorities));
         return token;
     }

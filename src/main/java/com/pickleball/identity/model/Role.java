@@ -1,5 +1,6 @@
 package com.pickleball.identity.model;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -25,6 +26,7 @@ public class Role {
             cascade = CascadeType.ALL,
             orphanRemoval = true
     )
+//    @JsonManagedReference
     private Set<RolePermission> permissions = new HashSet<>();
 
     // getters & setters
