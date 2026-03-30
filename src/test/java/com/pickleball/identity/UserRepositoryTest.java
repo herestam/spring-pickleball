@@ -1,0 +1,32 @@
+package com.pickleball.identity;
+
+import com.pickleball.identity.model.User;
+import com.pickleball.identity.repository.UserRepository;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+
+import static org.assertj.core.api.Assertions.assertThat;
+
+@SpringBootTest
+public class UserRepositoryTest {
+
+    @Autowired
+    private UserRepository userRepository;
+
+    @Test
+    public void testSaveUserToDatabase() {
+        // Given
+        User user = new User();
+        user.setUsername("Test User");
+        user.setPassword("user test");
+
+        // When
+        User savedUser = userRepository.save(user);
+
+        // Then
+        assertThat(savedUser).isNotNull();
+        assertThat(savedUser.getId()).isNotNull();
+        assertThat(savedUser.getUsername()).isEqualTo("Test User");
+    }
+}
